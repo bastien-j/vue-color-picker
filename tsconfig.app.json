@@ -5,6 +5,7 @@
   "compilerOptions": {
     "composite": true,
     "baseUrl": ".",
+    "lib": ["DOM", "DOM.Iterable", "ES2017"],
     "paths": {
       "@/*": ["./src/*"]
     }

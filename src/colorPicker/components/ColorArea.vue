@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref } from 'vue'
-import { hsvToHsl, parseHSVFromHSL } from '../colorParser'
+import { hsvToHsl, parseHSV } from '../colorParser'
 import { watch } from 'vue';
 
 type Area = {
@@ -69,7 +69,7 @@ function stopDragging() {
 function parseModelValue() {
   if (dragging.value || !props.modelValue || !area.value) return
 
-  const { s, v } = parseHSVFromHSL(props.modelValue)
+  const { s, v } = parseHSV(props.modelValue)
   moveCursor({
     x: area.value.x + s * area.value.width / 100,
     y: (area.value.y + area.value.height) - v * area.value.height / 100

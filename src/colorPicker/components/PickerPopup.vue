@@ -2,7 +2,9 @@
 import { computed, ref } from 'vue';
 import ColorArea from './ColorArea.vue';
 import HueSlider from './HueSlider.vue';
-import { isValidHSL, parseHSVFromHSL } from '../colorParser';
+import FormatSelector from './FormatSelector.vue';
+import { guessFormat, isValidFormat, parseHSV } from '../colorParser';
+import type { ColorFormat } from '../types';
 
 const props = defineProps<{
   value?: string
@@ -13,10 +15,12 @@ const emits = defineEmits<{
   (e: 'update', value: string): void
 }>()
 const show = ref(false)
-const hue = ref(props.value ? parseHSVFromHSL(props.value).h : 0)
+const hue = ref(props.value ? parseHSV(props.value).h : 0)
 const currentColor = ref(props.value ?? '')
+const colorFormat = ref<ColorFormat>(guessFormat(currentColor.value) ?? 'rgb')
+const formattedColor = ref(currentColor.value)
 
-const invalidValue = computed(() => props.value && !isValidHSL(props.value))
+const invalidValue = computed(() => props.value && !isValidFormat(props.value))
 
 function open() {
   show.value = true
@@ -30,7 +34,7 @@ function close(emitColor?: boolean) {
 function reset() {
   if (props.value !== undefined) {
     currentColor.value = props.value
-    hue.value = parseHSVFromHSL(props.value).h
+    hue.value = parseHSV(props.value).h
   }
 }
 function toggle() {
@@ -39,7 +43,8 @@ function toggle() {
 }
 
 function emitCSSColor() {
-  emits('update', currentColor.value)
+  if (formattedColor.value !== currentColor.value) emits('update', formattedColor.value)
+  else emits('update', currentColor.value)
 }
 
 defineExpose({
@@ -55,9 +60,10 @@ defineExpose({
     </div>
     <template v-if="invalidValue">Invalid input value</template>
     <template v-else>
-      <ColorArea :hue="hue" :initial-value="value" v-model="currentColor" />
+      <ColorArea :hue="hue" v-model="currentColor" />
       <div class="clr-pckr-infos">
         <HueSlider v-model="hue" />
+        <FormatSelector v-model="colorFormat" :current-color="currentColor" @update:format="formattedColor = $event" />
       </div>
       <div class="clr-pckr-actions">
         <button class="clr-pckr-btn" @click="reset()">
@@ -85,6 +91,7 @@ defineExpose({
   flex-direction: column;
   font-family: sans-serif;
   transition: .25s;
+  max-width: 300px;
 
   &.show {
     opacity: 1;
@@ -122,6 +129,9 @@ defineExpose({
 
   .clr-pckr-infos {
     padding: 16px 16px 0px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
   }
 
   .clr-pckr-actions {

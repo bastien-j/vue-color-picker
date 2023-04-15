@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
-const myColor = ref("hsl(113, 67%, 50%)")
+const HSL_COLOR = "hsl(113, 67%, 50%)"
+const RGB_COLOR = "rgb(203, 62, 37)"
+
+const myColor = ref(HSL_COLOR)
 </script>
 
 <template>
