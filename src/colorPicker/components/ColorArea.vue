@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref } from 'vue'
 import { hsvToHsl, parseHSVFromHSL } from '../colorParser'
+import { watch } from 'vue';
+import type { HSV } from '../types';
 
 type Area = {
   x: number
@@ -12,18 +14,10 @@ type CursorPosition = {
   x: number
   y: number
 }
-type HSVColor = {
-  h: number,
-  s: number,
-  v: number
-}
 type Props = {
   hue: number
-  initialValue?: string
-  lazy?: boolean
-  modelValue?: string
+  modelValue?: string,
 }
-
 const props = defineProps<Props>()
 const emits = defineEmits<{
   (e: 'update', value: string): void
@@ -35,19 +29,19 @@ const areaDom = ref<HTMLDivElement>()
 const cursorPos = ref<CursorPosition>({x: 0, y: 0})
 const dragging = ref(false)
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const areaColor = computed(() => `hsl(${props.hue}, 100%, 50%)`)
-const hsv = computed<HSVColor>(() => ({
+const hsv = computed<HSV>(() => ({
   h: props.hue,
   s: area.value ? cursorPos.value.x / area.value.width : 0,
   v: area.value ? 1 - cursorPos.value.y / area.value.height : 0
 }))
-const hsl = computed(() => hsvToHsl(hsv.value.h, hsv.value.s * 100, hsv.value.v * 100))
-const hslCSS = computed(() => `hsl(${hsl.value.h}, ${hsl.value.s}%, ${hsl.value.l}%)`)
+const hslCSS = computed(() => {
+  const { h, s, l } = hsvToHsl(hsv.value.h, hsv.value.s * 100, hsv.value.v * 100)
+  return `hsl(${h}, ${s}%, ${l}%)`
+})
 
 function emitValue() {
   nextTick(() => {
-    if (props.modelValue) emits('update:modelValue', hslCSS.value)
+    if (props.modelValue !== undefined) emits('update:modelValue', hslCSS.value)
     else emits('update', hslCSS.value)
   })
 }
@@ -60,7 +54,7 @@ function moveCursor(e: { x: number, y: number }, force = false) {
     x: Math.max(0, Math.min(area.value.width, x - area.value.x)),
     y: Math.max(0, Math.min(area.value.height, y - area.value.y))
   }
-  if (!props.lazy) emitValue()
+  emitValue()
 }
 function startDragging() {
   document.addEventListener('pointermove', moveCursor)
@@ -71,16 +65,19 @@ function stopDragging() {
   dragging.value = false
   document.removeEventListener('pointermove', moveCursor)
   document.removeEventListener('pointerup', stopDragging)
-  if (props.lazy) emitValue()
 }
+
+watch(() => props.hue, () => {
+  emitValue()
+})
 
 onMounted(() => {
   if (areaDom.value) {
     const { x, y, width, height } = areaDom.value.getBoundingClientRect()
     area.value = { x, y, width, height }
   }
-  if (area.value && props.initialValue) {
-    const { s, v } = parseHSVFromHSL(props.initialValue)
+  if (area.value && props.modelValue) {
+    const { s, v } = parseHSVFromHSL(props.modelValue)
     moveCursor({
       x: area.value.x + s * area.value.width / 100,
       y: (area.value.y + area.value.height) - v * area.value.height / 100
@@ -109,7 +106,7 @@ onMounted(() => {
   height: 200px;
   background-image:
     linear-gradient(rgba(0,0,0,0),#000),
-    linear-gradient(90deg,#fff,v-bind(areaColor));
+    linear-gradient(90deg,#fff,Hsl(v-bind(hue), 100%, 50%));
   position: relative;
   user-select: none;
 
@@ -122,6 +119,7 @@ onMounted(() => {
     border: 3px solid white;
     cursor: pointer;
     transform: translate3d(-50%, -50%, 0);
+    box-shadow: 0 0 5px hsl(0, 0%, 50%);
   }
 }
 </style>

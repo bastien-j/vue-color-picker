@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
-const myColor = ref('hsl(0, 0%, 0%)')
+const myColor = ref("hsl(113, 67%, 50%)")
 </script>
 
 <template>
   <div class="pickers">
-    <ColorPicker :value="myColor" />
+    <ColorPicker v-model="myColor" />
+    Current color : {{ myColor }}
   </div>
 </template>
 

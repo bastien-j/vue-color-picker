@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue';
 import ColorArea from './ColorArea.vue';
 import HueSlider from './HueSlider.vue';
-import { isValidHSL } from '../colorParser';
+import { isValidHSL, parseHSVFromHSL } from '../colorParser';
 
 const props = defineProps<{
   value?: string
@@ -13,7 +13,8 @@ const emits = defineEmits<{
   (e: 'update', value: string): void
 }>()
 const show = ref(false)
-const hue = ref(0)
+const hue = ref(props.value ? parseHSVFromHSL(props.value).h : 0)
+const currentColor = ref(props.value ?? '')
 
 const invalidValue = computed(() => props.value && !isValidHSL(props.value))
 
@@ -21,17 +22,18 @@ function open() {
   show.value = true
   emits('open')
 }
-function close() {
+function close(emitColor?: boolean) {
   show.value = false
   emits('close')
+  if (emitColor) emitCSSColor()
 }
 function toggle() {
   if (show.value) close()
   else open()
 }
 
-function emitCSSColor(e: string) {
-  emits('update', e)
+function emitCSSColor() {
+  emits('update', currentColor.value)
 }
 
 defineExpose({
@@ -47,13 +49,15 @@ defineExpose({
     </div>
     <template v-if="invalidValue">Invalid input value</template>
     <template v-else>
-      <ColorArea :hue="hue" :initial-value="value" @update="emitCSSColor" lazy />
-      <HueSlider v-model="hue" />
+      <ColorArea :hue="hue" :initial-value="value" v-model="currentColor" />
+      <div class="clr-pckr-infos">
+        <HueSlider v-model="hue" />
+      </div>
       <div class="clr-pckr-actions">
         <button class="clr-pckr-btn" @click="close()">
           <span class="material-icons">undo</span>
         </button>
-        <button class="clr-pckr-btn" @click="close()">
+        <button class="clr-pckr-btn" @click="close(true)">
           <span class="material-icons">done</span>
         </button>
       </div>
@@ -71,10 +75,8 @@ defineExpose({
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
   font-family: sans-serif;
 
   &.show {
@@ -105,16 +107,22 @@ defineExpose({
     align-items: center;
     font-size: 20px;
     color: #6A6C7E;
+    padding: 16px;
 
     .clr-pckr-btn {
       margin-left: auto;
     }
   }
 
+  .clr-pckr-infos {
+    padding: 16px;
+  }
+
   .clr-pckr-actions {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    padding: 16px;
   }
 }
 </style>
