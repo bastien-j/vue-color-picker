@@ -2,7 +2,6 @@
 import { computed, nextTick, onMounted, ref } from 'vue'
 import { hsvToHsl, parseHSVFromHSL } from '../colorParser'
 import { watch } from 'vue';
-import type { HSV } from '../types';
 
 type Area = {
   x: number
@@ -67,8 +66,21 @@ function stopDragging() {
   document.removeEventListener('pointerup', stopDragging)
 }
 
+function parseModelValue() {
+  if (dragging.value || !props.modelValue || !area.value) return
+
+  const { s, v } = parseHSVFromHSL(props.modelValue)
+  moveCursor({
+    x: area.value.x + s * area.value.width / 100,
+    y: (area.value.y + area.value.height) - v * area.value.height / 100
+  }, true)
+}
+
 watch(() => props.hue, () => {
   emitValue()
+})
+watch(() => props.modelValue, () => {
+  parseModelValue()
 })
 
 onMounted(() => {
@@ -76,13 +88,7 @@ onMounted(() => {
     const { x, y, width, height } = areaDom.value.getBoundingClientRect()
     area.value = { x, y, width, height }
   }
-  if (area.value && props.modelValue) {
-    const { s, v } = parseHSVFromHSL(props.modelValue)
-    moveCursor({
-      x: area.value.x + s * area.value.width / 100,
-      y: (area.value.y + area.value.height) - v * area.value.height / 100
-    }, true)
-  }
+  parseModelValue()
 })
 </script>
 
