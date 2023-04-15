@@ -28,7 +28,10 @@ function close(emitColor?: boolean) {
   if (emitColor) emitCSSColor()
 }
 function reset() {
-  if (props.value !== undefined) currentColor.value = props.value
+  if (props.value !== undefined) {
+    currentColor.value = props.value
+    hue.value = parseHSVFromHSL(props.value).h
+  }
 }
 function toggle() {
   if (show.value) close()
@@ -48,7 +51,7 @@ defineExpose({
   <div class="clr-pckr-popup" :class="{show}">
     <div class="clr-pckr-header">
       Couleur
-      <button  class="clr-pckr-btn"><span class="material-icons">close</span></button>
+      <button  class="clr-pckr-btn" @click="close()"><span class="material-icons">close</span></button>
     </div>
     <template v-if="invalidValue">Invalid input value</template>
     <template v-else>
@@ -81,12 +84,12 @@ defineExpose({
   display: flex;
   flex-direction: column;
   font-family: sans-serif;
+  transition: .25s;
 
   &.show {
     opacity: 1;
     visibility: visible;
     pointer-events: all;
-    transition: .25s;
   }
 
   .clr-pckr-btn {
@@ -118,7 +121,7 @@ defineExpose({
   }
 
   .clr-pckr-infos {
-    padding: 16px;
+    padding: 16px 16px 0px 16px;
   }
 
   .clr-pckr-actions {
