@@ -29,13 +29,13 @@ const areaDom = ref<HTMLDivElement>()
 const cursorPos = ref<CursorPosition>({x: 0, y: 0})
 const dragging = ref(false)
 
-const hsv = computed<HSV>(() => ({
-  h: props.hue,
-  s: area.value ? cursorPos.value.x / area.value.width : 0,
-  v: area.value ? 1 - cursorPos.value.y / area.value.height : 0
-}))
 const hslCSS = computed(() => {
-  const { h, s, l } = hsvToHsl(hsv.value.h, hsv.value.s * 100, hsv.value.v * 100)
+  const { h, s, l } = hsvToHsl(
+    props.hue,
+    (area.value ? cursorPos.value.x / area.value.width : 0) * 100,
+    (area.value ? 1 - cursorPos.value.y / area.value.height : 0) * 100
+  )
+
   return `hsl(${h}, ${s}%, ${l}%)`
 })
 

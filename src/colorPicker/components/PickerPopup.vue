@@ -27,6 +27,9 @@ function close(emitColor?: boolean) {
   emits('close')
   if (emitColor) emitCSSColor()
 }
+function reset() {
+  if (props.value !== undefined) currentColor.value = props.value
+}
 function toggle() {
   if (show.value) close()
   else open()
@@ -54,7 +57,7 @@ defineExpose({
         <HueSlider v-model="hue" />
       </div>
       <div class="clr-pckr-actions">
-        <button class="clr-pckr-btn" @click="close()">
+        <button class="clr-pckr-btn" @click="reset()">
           <span class="material-icons">undo</span>
         </button>
         <button class="clr-pckr-btn" @click="close(true)">

@@ -12,7 +12,7 @@ defineEmits(['update:modelValue'])
     class="clr-pckr-hue-slider"
     type="range"
     min="0"
-    max="359"
+    max="360"
     :value="modelValue ?? 0"
     @input="$emit('update:modelValue', parseInt(($event.target as HTMLInputElement).value))"
   />
