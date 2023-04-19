@@ -1,4 +1,4 @@
-import type { ColorFormat, ColorOutput, HSL, HSV, RGB } from './types'
+import type { ColorFormat, ColorOutput, HSL, HSV, RGB } from '../types'
 
 function isHSL(color: string) {
   return color.startsWith('hsl(')
@@ -53,7 +53,11 @@ export function parseHSL(color: string): HSL {
   color = /*isHSLA(color) ? color.slice(5, -1) :*/ color.slice(4, -1)
   const [h, s, l] = color.replace(/[ %]/g, '').split(',').map(v => parseInt(v))
 
-  return { h, s, l }
+  return {
+    h: Math.round(h),
+    s: parseFloat((s / 100).toFixed(2)),
+    l: parseFloat((l / 100).toFixed(2))
+  }
 }
 
 export function parseRGB(color: string): RGB {
@@ -74,32 +78,6 @@ export function parseRGBFromHEX(color: string): RGB {
   const [r, g, b] = matches.map(v => parseInt(v, 16))
 
   return { r, g, b }
-}
-
-export function parseHSVFromHSL(color: string) {
-  const format = guessFormat(color)
-  if (!format) throw new Error(`Unknown color format`)
-  // if (format === 'hex')
-  if (!isValidHSL(color)) throw new Error(`Invalid HSL color string: ${color}`)
-
-  const hsl = parseHSL(color)
-
-  return hslToHsv(hsl.h, hsl.s, hsl.l)
-}
-
-export function parseHSV(color: string): HSV {
-  const format = guessFormat(color)
-  if (!format) throw new Error(`Unknown color format`)
-  let hsl = null
-  if (format === 'hsl') hsl = parseHSL(color)
-  else if (format === 'rgb') {
-    const rgb = parseRGB(color)
-    hsl = rgbToHsl(rgb.r, rgb.g, rgb.b)
-  } else {
-    const rgb = parseRGBFromHEX(color)
-    hsl = rgbToHsl(rgb.r, rgb.g, rgb.b)
-  }
-  return hslToHsv(hsl.h, hsl.s, hsl.l)
 }
 
 export function parse<T extends ColorFormat>(color: string, format: T): ColorOutput<T> {
@@ -127,30 +105,28 @@ export function parse<T extends ColorFormat>(color: string, format: T): ColorOut
 }
 
 export function hsvToHsl(h: number, s: number, v: number): HSL {
-  s /= 100
-  v /= 100
-
   const l = v * (1 - s / 2)
-
   s = !l || l == 1 ? 0 : (v - l) / Math.min(l, 1 - l)
 
-  return { h: Math.round(h), s: Math.round(s * 100), l: Math.round(l * 100) }
+  return {
+    h: Math.round(h),
+    s: parseFloat(s.toFixed(2)),
+    l: parseFloat(l.toFixed(2))
+  }
 }
 
 export function hslToHsv(h: number, s: number, l: number): HSV {
-  s /= 100
-  l /= 100
-
   const v = l + s * Math.min(l, 1 - l)
   s = v == 0 ? 0 : 2 * (1 - l / v)
 
-  return { h: Math.round(h), s: Math.round(s * 100), v: Math.round(v * 100) }
+  return {
+    h: Math.round(h),
+    s: parseFloat(s.toFixed(2)),
+    v: parseFloat(v.toFixed(2))
+  }
 }
 
 export function hslToRgb(h: number, s: number, l: number): RGB {
-  s /= 100
-  l /= 100
-
   function fn(n: number) {
     const k = (n + h / 30) % 12
     const a = s * Math.min(l, 1 - l)
@@ -186,9 +162,34 @@ export function rgbToHsl(r: number, g: number, b: number): HSL {
     s = (v - l) / Math.min(l, 1 - l)
   }
 
-  return { h, s: Math.round(s * 100), l: Math.round(l * 100) }
+  return {
+    h: Math.round(h),
+    s: parseFloat(s.toFixed(2)),
+    l: parseFloat(l.toFixed(2))
+  }
 }
 
 export function rgbToHex(r: number, g: number, b: number): string {
-  return `#${r.toString(16)}${g.toString(16)}${b.toString(16).padStart(2, '0')}`
+  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`
+}
+
+export function hslToString({ h, s, l }: HSL, format?: ColorFormat) {
+  if (!format || format === 'hsl') return `hsl(${h}, ${Math.round(s * 100)}%, ${Math.round(l * 100)}%)`
+  else if (format === 'rgb') {
+    const { r, g, b } = hslToRgb(h, s, l)
+    return `rgb(${r}, ${g}, ${b})`
+  } else {
+    const { r, g, b } = hslToRgb(h, s, l)
+    return rgbToHex(r, g, b)
+  }
+}
+
+export function rgbToString({ r, g, b }: RGB, format?: ColorFormat) {
+  if (!format || format === 'rgb') return `rgb(${r}, ${g}, ${b})`
+  else if (format === 'hsl') {
+    const { h, s, l } = rgbToHsl(r, g, b)
+    return `hsl(${h}, ${Math.round(s * 100)}%, ${Math.round(l * 100)}%)`
+  } else {
+    return rgbToHex(r, g, b)
+  }
 }

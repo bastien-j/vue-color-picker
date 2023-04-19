@@ -3,24 +3,22 @@ import { computed, ref } from 'vue';
 import ColorArea from './ColorArea.vue';
 import HueSlider from './HueSlider.vue';
 import FormatSelector from './FormatSelector.vue';
-import { guessFormat, isValidFormat, parseHSV } from '../colorParser';
-import type { ColorFormat } from '../types';
+import { useColor } from '../composables/color';
+import { guessFormat, hslToString, isValidFormat, parse } from '../utils/colorParser';
 
 const props = defineProps<{
-  value?: string
+  color: string
 }>()
 const emits = defineEmits<{
   (e: 'close'): void
   (e: 'open'): void
   (e: 'update', value: string): void
 }>()
-const show = ref(false)
-const hue = ref(props.value ? parseHSV(props.value).h : 0)
-const currentColor = ref(props.value ?? '')
-const colorFormat = ref<ColorFormat>(guessFormat(currentColor.value) ?? 'rgb')
-const formattedColor = ref(currentColor.value)
 
-const invalidValue = computed(() => props.value && !isValidFormat(props.value))
+const { format, h, s, l, hsl, clrToStr } = useColor(props.color)
+const show = ref(false)
+
+const invalidValue = computed(() => props.color && !isValidFormat(props.color))
 
 function open() {
   show.value = true
@@ -31,11 +29,16 @@ function close(emitColor?: boolean) {
   emits('close')
   if (emitColor) emitCSSColor()
 }
-function reset() {
-  if (props.value !== undefined) {
-    currentColor.value = props.value
-    hue.value = parseHSV(props.value).h
-  }
+function reset(color?: string) {
+  const _format = guessFormat(color ?? props.color)
+  if (!_format) return
+  const _hslColor = parse(color ?? props.color, 'hsl')
+  console.log(_format)
+  console.log(_hslColor)
+  // h.value = _hslColor.h
+  // s.value = _hslColor.s
+  // l.value = _hslColor.l
+  // format.value = _format
 }
 function toggle() {
   if (show.value) close()
@@ -43,8 +46,16 @@ function toggle() {
 }
 
 function emitCSSColor() {
-  if (formattedColor.value !== currentColor.value) emits('update', formattedColor.value)
-  else emits('update', currentColor.value)
+  emits('update', clrToStr.value)
+}
+// function hslHandler(event: HSL) {
+//   // console.log(event)
+//   currentColor.value = hslToString(event, colorFormat.value)
+// }
+function manualHandler(event: string) {
+  if (!isValidFormat(event)) return
+  console.log('manual update')
+  reset(event)
 }
 
 defineExpose({
@@ -55,15 +66,22 @@ defineExpose({
 <template>
   <div class="clr-pckr-popup" :class="{show}">
     <div class="clr-pckr-header">
-      Couleur
-      <button  class="clr-pckr-btn" @click="close()"><span class="material-icons">close</span></button>
+      <div class="clr-pckr-preview" :style="{backgroundColor: clrToStr}"></div>
+      <button  class="clr-pckr-btn" @click="close()">
+        <span class="material-icons">close</span>
+      </button>
     </div>
     <template v-if="invalidValue">Invalid input value</template>
     <template v-else>
-      <ColorArea :hue="hue" v-model="currentColor" />
+      <ColorArea
+        :current-color="clrToStr"
+        :h="h"
+        v-model:s="s"
+        v-model:l="l"
+      />
       <div class="clr-pckr-infos">
-        <HueSlider v-model="hue" />
-        <FormatSelector v-model="colorFormat" :current-color="currentColor" @update:format="formattedColor = $event" />
+        <HueSlider v-model="h" />
+        <FormatSelector v-model="format" :current-color="hslToString(hsl)" @update="manualHandler" />
       </div>
       <div class="clr-pckr-actions">
         <button class="clr-pckr-btn" @click="reset()">
@@ -122,6 +140,12 @@ defineExpose({
     color: #6A6C7E;
     padding: 16px;
 
+    .clr-pckr-preview {
+      width: 42px;
+      height: 42px;
+      border-radius: 99px;
+      box-shadow: 0 0 10px lightgray;
+    }
     .clr-pckr-btn {
       margin-left: auto;
     }

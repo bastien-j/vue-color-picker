@@ -1,20 +1,20 @@
 import { expect, test } from 'vitest'
-import { parseHSL, guessFormat, hsvToHsl, hslToHsv, hslToRgb, rgbToHex, rgbToHsl } from '../colorParser'
+import { parseHSL, guessFormat, hsvToHsl, hslToHsv, hslToRgb, rgbToHex, rgbToHsl } from '../utils/colorParser'
 
 test('parse hsl', () => {
-  expect(parseHSL('hsl(100, 54%, 34%)')).toStrictEqual({ h: 100, s: 54, l: 34 })
+  expect(parseHSL('hsl(100, 54%, 34%)')).toStrictEqual({ h: 100, s: 0.54, l: 0.34 })
 })
 test('throw invalid HSL color', () => {
   expect(() => parseHSL('hdsl(100, 54%, 34%)')).toThrowError('Invalid HSL color string')
 })
 test('hsv to hsl', () => {
-  expect(hsvToHsl(220, 51, 75)).toStrictEqual({ h: 220, s: 43, l: 56 })
+  expect(hsvToHsl(220, 0.51, 0.75)).toStrictEqual({ h: 220, s: 0.43, l: 0.56 })
 })
 test('hsl to hsv', () => {
-  expect(hslToHsv(220, 43, 56)).toStrictEqual({ h: 220, s: 51, v: 75 })
+  expect(hslToHsv(220, 0.43, 0.56)).toStrictEqual({ h: 220, s: 0.51, v: 0.75 })
 })
 test('hsl to rgb', () => {
-  expect(hslToRgb(220, 43, 56)).toStrictEqual({ r: 95, g: 127, b: 191 })
+  expect(hslToRgb(220, 0.43, 0.56)).toStrictEqual({ r: 95, g: 127, b: 191 })
 })
 test('rgb to hex', () => {
   expect(rgbToHex(95, 127, 191)).toStrictEqual('#5f7fbf')
@@ -38,5 +38,5 @@ test('guess invalid hex', () => {
   expect(guessFormat('#5g7fbf')).toBeNull()
 })
 test('rgb to hsl', () => {
-  expect(rgbToHsl(95, 127, 191)).toStrictEqual({ h: 220, s: 43, l: 56 })
+  expect(rgbToHsl(95, 127, 191)).toStrictEqual({ h: 220, s: 0.43, l: 0.56 })
 })
