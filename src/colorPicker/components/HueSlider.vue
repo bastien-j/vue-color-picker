@@ -1,10 +1,23 @@
 <script setup lang="ts">
-type Props = {
-  modelValue?: number
-}
+import { computed } from 'vue';
+import type { HSL } from '../types';
 
-defineProps<Props>()
-defineEmits(['update:modelValue'])
+const props = defineProps<{
+  modelValue?: number
+}>()
+const emits = defineEmits<{
+  (e: 'update:model-value', value?: HSL): void
+}>()
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const gradientColor = computed(() => `hsl(${props.modelValue}, 100%, 50%)`)
+
+// function emitHue(hue: string) {
+//   if (!props.value) return
+//   emits('update', {
+//     ...props.value,
+//     h: parseInt(hue)
+//   })
+// }
 </script>
 
 <template>
@@ -13,8 +26,8 @@ defineEmits(['update:modelValue'])
     type="range"
     min="0"
     max="360"
-    :value="modelValue ?? 0"
-    @input="$emit('update:modelValue', parseInt(($event.target as HTMLInputElement).value))"
+    :value="modelValue"
+    @input="$emit('update:model-value', parseInt(($event.target as HTMLInputElement).value))"
   />
 </template>
 
@@ -28,7 +41,7 @@ defineEmits(['update:modelValue'])
 
   &::-webkit-slider-thumb {
     appearance: none;
-    background-color: Hsl(v-bind(modelValue), 100%, 50%);
+    background-color: v-bind(gradientColor);
     border-radius: 999px;
     width: 20px;
     height: 20px;

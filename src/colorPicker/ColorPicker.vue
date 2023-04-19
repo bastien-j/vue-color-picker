@@ -2,8 +2,6 @@
 import { ref } from 'vue';
 import PickerPopup from './components/PickerPopup.vue';
 
-const DEFAULT_COLOR = 'hsl(0, 0%, 0%)'
-
 const props = defineProps<{
   modelValue?: string
   value?: string
@@ -11,7 +9,7 @@ const props = defineProps<{
 const emits = defineEmits(['update:modelValue', 'update'])
 
 const popupRef = ref<InstanceType<typeof PickerPopup>>()
-const currentColor = ref(props.modelValue ?? props.value ?? DEFAULT_COLOR)
+const currentColor = ref(props.modelValue ?? props.value ?? 'hsl(0, 0%, 0%)')
 
 function toggle() {
   popupRef.value?.toggle()
@@ -29,7 +27,7 @@ function emitColor(color: string) {
     <button @click.prevent="toggle()"></button>
     <PickerPopup
       ref="popupRef"
-      :value="currentColor"
+      :color="currentColor"
       @update="emitColor($event)"
     />
   </div>
@@ -47,6 +45,7 @@ function emitColor(color: string) {
     height: var(--size);
     border-radius: 7px;
     border: none;
+    box-shadow: 0 0 10px lightgray;
 
     &:not(:disabled) {
       &:hover {
