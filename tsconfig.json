@@ -1,14 +1,17 @@
 {
-  "files": [],
+  "extends": "@vue/tsconfig/tsconfig.web.json",
+  "include": ["env.d.ts", "src/colorPicker/**/*", "src/colorPicker/**/*.vue"],
+  "exclude": ["src/colorPicker/**/__tests__/*"],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "lib": ["DOM", "ES2017"],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
   "references": [
     {
       "path": "./tsconfig.node.json"
-    },
-    {
-      "path": "./tsconfig.app.json"
-    },
-    {
-      "path": "./tsconfig.vitest.json"
     }
   ]
 }
