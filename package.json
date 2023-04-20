@@ -1,6 +1,6 @@
 {
   "name": "vue-color-picker",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "keywords": [
     "vue",
     "vue 3",
@@ -13,13 +13,26 @@
   },
   "license": "MIT",
   "type": "module",
-  "private": true,
+  "files": [
+    "dist/"
+  ],
+  "main": "./dist/vue-color-picker.umd.cjs",
+  "module": "./dist/vue-color-picker.js",
+  "exports": {
+    ".": {
+      "import": "./dist/vue-color-picker.js",
+      "require": "./dist/vue-color-picker.umd.cjs"
+    },
+    "./style.css": "./dist/style.css"
+  },
+  "types": "./dist/types.d.ts",
   "scripts": {
     "dev": "vite",
-    "build": "run-p type-check build-only",
+    "build": "run-p type-check build-only generate:types",
     "preview": "vite preview",
     "test:unit": "vitest",
     "build-only": "vite build",
+    "generate:types": "vue-tsc --declaration --emitDeclarationOnly --outdir ./dist",
     "type-check": "vue-tsc --noEmit -p tsconfig.vitest.json --composite false",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "format": "prettier --write src/"
