@@ -9,6 +9,7 @@ const myColor = ref(HSL_COLOR)
 </script>
 
 <template>
+  <div style="height: 300px"></div>
   <div class="pickers">
     <ColorPicker v-model="myColor" />
     Current color : {{ myColor }}

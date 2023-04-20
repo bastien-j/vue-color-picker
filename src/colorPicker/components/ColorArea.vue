@@ -39,9 +39,9 @@ const dragging = ref(false)
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const gradientColor = computed(() => `hsl(${props.h}, 100%, 50%)`)
 
-function moveCursor(e: { x: number, y: number }, emit = true) {
+function moveCursor(e: { pageX: number, pageY: number }, emit = true) {
   if (!area.value) return
-  const { x, y } = e
+  const { pageX: x, pageY: y } = e
   const posX = Math.max(0, Math.min(area.value.width, x - area.value.x))
   const posY = Math.max(0, Math.min(area.value.height, y - area.value.y))
   if (emit) {
@@ -67,8 +67,8 @@ onMounted(() => {
     area.value = { x, y, width, height }
     const { s, v } = hslToHsv(props.h, props.s, props.l)
     moveCursor({
-      x: area.value.x + s * area.value.width,
-      y: (area.value.y + area.value.height) - v * area.value.height
+      pageX: area.value.x + s * area.value.width,
+      pageY: (area.value.y + area.value.height) - v * area.value.height
     })
   }
 })
