@@ -51,6 +51,7 @@ function moveCursor(e: { pageX: number, pageY: number }, emit = true) {
   }
 }
 function startDragging() {
+  updateArea()
   document.addEventListener('pointermove', moveCursor)
   document.addEventListener('pointerup', stopDragging)
   dragging.value = true
@@ -61,10 +62,16 @@ function stopDragging() {
   document.removeEventListener('pointerup', stopDragging)
 }
 
-onMounted(() => {
+function updateArea() {
   if (areaDom.value) {
     const { x, y, width, height } = areaDom.value.getBoundingClientRect()
     area.value = { x, y, width, height }
+  }
+}
+
+onMounted(() => {
+  updateArea()
+  if (area.value) {
     const { s, v } = hslToHsv(props.h, props.s, props.l)
     moveCursor({
       pageX: area.value.x + s * area.value.width,
