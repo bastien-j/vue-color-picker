@@ -104,6 +104,7 @@ defineExpose({
   font-family: sans-serif;
   transition: .25s;
   max-width: 300px;
+  z-index: 2023;
 
   &.show {
     opacity: 1;
