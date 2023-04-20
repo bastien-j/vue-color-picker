@@ -33,12 +33,10 @@ function reset(color?: string) {
   const _format = guessFormat(color ?? props.color)
   if (!_format) return
   const _hslColor = parse(color ?? props.color, 'hsl')
-  console.log(_format)
-  console.log(_hslColor)
-  // h.value = _hslColor.h
-  // s.value = _hslColor.s
-  // l.value = _hslColor.l
-  // format.value = _format
+  h.value = _hslColor.h
+  s.value = _hslColor.s
+  l.value = _hslColor.l
+  format.value = _format
 }
 function toggle() {
   if (show.value) close()
@@ -48,13 +46,9 @@ function toggle() {
 function emitCSSColor() {
   emits('update', clrToStr.value)
 }
-// function hslHandler(event: HSL) {
-//   // console.log(event)
-//   currentColor.value = hslToString(event, colorFormat.value)
-// }
+
 function manualHandler(event: string) {
   if (!isValidFormat(event)) return
-  console.log('manual update')
   reset(event)
 }
 

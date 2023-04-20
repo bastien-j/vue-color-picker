@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { hslToHsv, hsvToHsl } from '../utils/colorParser'
 
 type Area = {
@@ -26,29 +26,29 @@ const emits = defineEmits<{
 
 const area = ref<Area>()
 const areaDom = ref<HTMLDivElement>()
-const cursorPos = ref<CursorPosition>({x: 0, y: 0})
+const cursorPos = computed<CursorPosition>(() => {
+  if (!area.value) return {x: 0, y: 0}
+  const { s, v } = hslToHsv(props.h, props.s, props.l)
+  return {
+    x: s * area.value.width,
+    y: (1 - v) * area.value.height
+  }
+})
 const dragging = ref(false)
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const gradientColor = computed(() => `hsl(${props.h}, 100%, 50%)`)
 
-const hsl = computed(() => hsvToHsl(
-  props.h,
-  (area.value ? cursorPos.value.x / area.value.width : 0),
-  (area.value ? 1 - cursorPos.value.y / area.value.height : 0)
-))
-
 function moveCursor(e: { x: number, y: number }, emit = true) {
   if (!area.value) return
   const { x, y } = e
-  cursorPos.value = {
-    x: Math.max(0, Math.min(area.value.width, x - area.value.x)),
-    y: Math.max(0, Math.min(area.value.height, y - area.value.y))
+  const posX = Math.max(0, Math.min(area.value.width, x - area.value.x))
+  const posY = Math.max(0, Math.min(area.value.height, y - area.value.y))
+  if (emit) {
+    const { s, l } = hsvToHsl(props.h, posX / area.value.width, 1 - posY / area.value.height)
+    emits('update:s', s)
+    emits('update:l', l)
   }
-  if (emit) nextTick(() => {
-    emits('update:s', hsl.value.s)
-    emits('update:l', hsl.value.l)
-  })
 }
 function startDragging() {
   document.addEventListener('pointermove', moveCursor)
@@ -61,25 +61,16 @@ function stopDragging() {
   document.removeEventListener('pointerup', stopDragging)
 }
 
-function parseModelValue() {
-  if (dragging.value || !area.value) return
-
-  const { s, v } = hslToHsv(props.h, props.s, props.l)
-  moveCursor({
-    x: area.value.x + s * area.value.width,
-    y: (area.value.y + area.value.height) - v * area.value.height
-  }, false)
-}
-watch(() => props.s || props.l, () => {
-  parseModelValue()
-})
-
 onMounted(() => {
   if (areaDom.value) {
     const { x, y, width, height } = areaDom.value.getBoundingClientRect()
     area.value = { x, y, width, height }
+    const { s, v } = hslToHsv(props.h, props.s, props.l)
+    moveCursor({
+      x: area.value.x + s * area.value.width,
+      y: (area.value.y + area.value.height) - v * area.value.height
+    })
   }
-  parseModelValue()
 })
 </script>
 
