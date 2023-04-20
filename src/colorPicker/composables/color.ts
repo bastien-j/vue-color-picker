@@ -1,8 +1,6 @@
 import { computed, isRef, ref, unref, watchEffect } from "vue";
 import type { ColorFormat, MaybeRef } from "../types";
-import { guessFormat, hslToRgb, parse, rgbToHex } from "../utils/colorParser";
-import { hslToString } from "../utils/colorParser";
-import { rgbToString } from "../utils/colorParser";
+import { guessFormat, hslToRgb, hslToString, parse, rgbToHex, rgbToString } from "../utils/colorParser";
 
 export function useColor(color: MaybeRef<string>) {
   const h = ref(-1)
@@ -18,7 +16,6 @@ export function useColor(color: MaybeRef<string>) {
     if (format.value === 'rgb') return rgbToString(rgb.value)
     return hex.value
   })
-  // let oldColor = ''
 
   function doParse() {
     const _color = unref(color)
@@ -31,8 +28,6 @@ export function useColor(color: MaybeRef<string>) {
     h.value = _hslColor.h
     s.value = _hslColor.s
     l.value = _hslColor.l
-
-    // oldColor = _color
   }
 
   if (isRef(color)) watchEffect(doParse)

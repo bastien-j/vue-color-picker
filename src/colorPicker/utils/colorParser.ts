@@ -72,7 +72,7 @@ export function parseRGB(color: string): RGB {
 export function parseRGBFromHEX(color: string): RGB {
   if (!isValidHEX(color)) throw new Error(`Invalid HEX color string: ${color}`)
 
-  color = /*isHSLA(color) ? color.slice(5, -1) :*/ color.slice(1, -1)
+  color = color.slice(1)
   const matches = color.match(/.{1,2}/g)
   if (!matches) throw new Error(`Invalid HEX color string: ${color}`)
   const [r, g, b] = matches.map(v => parseInt(v, 16))
