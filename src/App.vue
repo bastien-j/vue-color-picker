@@ -5,11 +5,11 @@ const HSL_COLOR = "hsl(113, 67%, 50%)"
 const RGB_COLOR = "rgb(62, 213, 42)"
 const HEX_COLOR = "#3ed52a"
 
-const myColor = ref(HSL_COLOR)
+const myColor = ref(RGB_COLOR)
 </script>
 
 <template>
-  <div style="height: 300px"></div>
+  <!-- <div style="height: 300px"></div> -->
   <div class="pickers">
     <ColorPicker v-model="myColor" />
     Current color : {{ myColor }}
@@ -21,6 +21,7 @@ const myColor = ref(HSL_COLOR)
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: sans-serif;
 }
 .pickers {
   display: flex;
