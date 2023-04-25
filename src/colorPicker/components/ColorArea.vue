@@ -97,8 +97,8 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .clr-pckr-area {
-  width: 300px;
-  height: 200px;
+  width: 100%;
+  aspect-ratio: 3/2;
   background-image:
     linear-gradient(rgba(0,0,0,0),#000),
     linear-gradient(90deg,#fff,v-bind(gradientColor));

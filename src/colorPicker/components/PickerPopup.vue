@@ -5,6 +5,7 @@ import HueSlider from './HueSlider.vue';
 import FormatSelector from './FormatSelector.vue';
 import { useColor } from '../composables/color';
 import { guessFormat, hslToString, isValidFormat, parse } from '../utils/colorParser';
+import PopupButton from './PopupButton.vue';
 
 const props = defineProps<{
   color: string
@@ -61,9 +62,7 @@ defineExpose({
   <div class="clr-pckr-popup" :class="{show}">
     <div class="clr-pckr-header">
       <div class="clr-pckr-preview" :style="{backgroundColor: clrToStr}"></div>
-      <button  class="clr-pckr-btn" @click="close()">
-        <span class="material-icons">close</span>
-      </button>
+      <PopupButton icon="close" @click="close()" />
     </div>
     <template v-if="invalidValue">Invalid input value</template>
     <template v-else>
@@ -75,15 +74,11 @@ defineExpose({
       />
       <div class="clr-pckr-infos">
         <HueSlider v-model="h" />
-        <FormatSelector v-model="format" :current-color="hslToString(hsl)" @update="manualHandler" />
+        <!-- <FormatSelector v-model="format" :current-color="hslToString(hsl)" @update="manualHandler" /> -->
       </div>
       <div class="clr-pckr-actions">
-        <button class="clr-pckr-btn" @click="reset()">
-          <span class="material-icons">undo</span>
-        </button>
-        <button class="clr-pckr-btn" @click="close(true)">
-          <span class="material-icons">done</span>
-        </button>
+        <PopupButton icon="undo" @click="reset()" />
+        <PopupButton icon="check" @click="close(true)" />
       </div>
     </template>
   </div>
@@ -91,10 +86,12 @@ defineExpose({
 
 <style scoped lang="scss">
 .clr-pckr-popup {
+  --pad: 8px;
+
   position: absolute;
   top: 100%;
   background-color: white;
-  border-radius: 12px;
+  border-radius: 8px;
   box-shadow: 0 0 10px lightgray;
   opacity: 0;
   visibility: hidden;
@@ -103,7 +100,8 @@ defineExpose({
   flex-direction: column;
   font-family: sans-serif;
   transition: .25s;
-  max-width: 300px;
+  max-width: 250px;
+  width: 250px;
   z-index: 2023;
 
   &.show {
@@ -112,28 +110,12 @@ defineExpose({
     pointer-events: all;
   }
 
-  .clr-pckr-btn {
-    display: grid;
-    place-content: center;
-    padding: 8px;
-    background-color: hsl(0, 0%, 100%);
-    border: 1px solid lightgray;
-    border-radius: 8px;
-    font-size: 16px;
-
-    &:hover {
-      background-color: hsl(0, 0%, 93%);
-      cursor: pointer;
-      transition: .25s;
-    }
-  }
-
   .clr-pckr-header {
     display: flex;
     align-items: center;
     font-size: 20px;
     color: #6A6C7E;
-    padding: 16px;
+    padding: var(--pad);
 
     .clr-pckr-preview {
       width: 42px;
@@ -147,7 +129,7 @@ defineExpose({
   }
 
   .clr-pckr-infos {
-    padding: 16px 16px 0px 16px;
+    // padding: calc(2 * var(--pad)) var(--pad) 0px var(--pad);
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -157,7 +139,7 @@ defineExpose({
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px;
+    padding: var(--pad);
   }
 }
 </style>

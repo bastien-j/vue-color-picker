@@ -5,7 +5,7 @@ import type { HSL } from '../types';
 const props = defineProps<{
   modelValue?: number
 }>()
-const emits = defineEmits<{
+defineEmits<{
   (e: 'update:model-value', value?: HSL): void
 }>()
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -21,18 +21,20 @@ const gradientColor = computed(() => `hsl(${props.modelValue}, 100%, 50%)`)
 </script>
 
 <template>
-  <input
-    class="clr-pckr-hue-slider"
-    type="range"
-    min="0"
-    max="360"
-    :value="modelValue"
-    @input="$emit('update:model-value', parseInt(($event.target as HTMLInputElement).value))"
-  />
+  <div class="clr-pckr-hue-slider">
+    <input
+      class="clr-pckr-hue-slider"
+      type="range"
+      min="0"
+      max="360"
+      :value="modelValue"
+      @input="$emit('update:model-value', parseInt(($event.target as HTMLInputElement).value))"
+    />
+  </div>
 </template>
 
 <style scoped lang="scss">
-.clr-pckr-hue-slider {
+.clr-pckr-hue-slider > input[type="range"] {
   appearance: none;
   width: 100%;
   height: 6px;

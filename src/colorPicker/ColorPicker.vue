@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import PickerPopup from './components/PickerPopup.vue';
+import PopupLayout from './components/popup/PopupLayout.vue';
 
 const props = defineProps<{
   modelValue?: string
@@ -25,11 +26,12 @@ function emitColor(color: string) {
 <template>
   <div class="clr-pckr">
     <button @click.prevent="toggle()"></button>
-    <PickerPopup
+    <PopupLayout />
+    <!-- <PickerPopup
       ref="popupRef"
       :color="currentColor"
       @update="emitColor($event)"
-    />
+    /> -->
   </div>
 </template>
 
