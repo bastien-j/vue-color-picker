@@ -91,6 +91,8 @@ defineExpose({
 
 <style scoped lang="scss">
 .clr-pckr-popup {
+  position: absolute;
+  top: 100%;
   background: hsl(0, 100%, 100%);
   border-radius: 16px;
   box-shadow: hsl(0, 0%, 90%) 0 0 10px;
@@ -98,6 +100,8 @@ defineExpose({
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
+  z-index: 2023;
+  color: hsl(0, 0%, 15%);
 
   &.show {
     opacity: 1;
