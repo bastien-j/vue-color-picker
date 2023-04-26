@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import CustomSlider from '../../sliders/CustomSlider.vue';
 
 const props = defineProps<{
-  modelValue?: number
+  modelValue: number
 }>()
 defineEmits<{
   (e: 'update:model-value', value?: typeof props.modelValue): void
