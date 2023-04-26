@@ -28,7 +28,7 @@ onClickOutside(popupRef, () => popupRef.value.close())
 <template>
   <div class="clr-pckr">
     <button @click.prevent="toggle()"></button>
-    <PopupLayout ref="popupRef" :color="currentColor" @close="emitColor($event)" />
+    <PopupLayout ref="popupRef" :color="currentColor" @update="emitColor($event)" />
   </div>
 </template>
 

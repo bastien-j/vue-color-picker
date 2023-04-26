@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
-import { hslToHsv, hsvToHsl } from '../utils/colorParser'
+import { computed, onMounted, ref, watch } from 'vue'
+import { hslToHsv, hsvToHsl } from '../../../utils/colorParser'
 
 type Area = {
   x: number
@@ -8,17 +8,12 @@ type Area = {
   width: number
   height: number
 }
-type CursorPosition = {
-  x: number
-  y: number
-}
-type Props = {
+
+const props = defineProps<{
   h: number,
-  currentColor: string,
   s: number,
   l: number
-}
-const props = defineProps<Props>()
+}>()
 const emits = defineEmits<{
   (e: 'update:s', value: number): void
   (e: 'update:l', value: number): void
@@ -26,29 +21,26 @@ const emits = defineEmits<{
 
 const area = ref<Area>()
 const areaDom = ref<HTMLDivElement>()
-const cursorPos = computed<CursorPosition>(() => {
-  if (!area.value) return {x: 0, y: 0}
-  const { s, v } = hslToHsv(props.h, props.s, props.l)
-  return {
-    x: s * area.value.width,
-    y: (1 - v) * area.value.height
-  }
-})
+const cursorPos = ref({ x: 0, y: 0 })
 const dragging = ref(false)
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const gradientColor = computed(() => `hsl(${props.h}, 100%, 50%)`)
+const thumbColor = computed(() => `hsl(${props.h}, ${props.s * 100}%, ${props.l * 100}%)`)
 
 function moveCursor(e: { pageX: number, pageY: number }, emit = true) {
   if (!area.value) return
   const { pageX: x, pageY: y } = e
   const posX = Math.max(0, Math.min(area.value.width, x - area.value.x))
   const posY = Math.max(0, Math.min(area.value.height, y - area.value.y))
-  if (emit) {
-    const { s, l } = hsvToHsl(props.h, posX / area.value.width, 1 - posY / area.value.height)
-    emits('update:s', s)
-    emits('update:l', l)
+  cursorPos.value = {
+    x: posX,
+    y: posY
   }
+  if (!emit) return
+  const { s, l } = hsvToHsl(props.h, posX / area.value.width, 1 - posY / area.value.height)
+  emits('update:s', s)
+  emits('update:l', l)
 }
 function startDragging() {
   updateArea()
@@ -69,15 +61,23 @@ function updateArea() {
   }
 }
 
-onMounted(() => {
-  updateArea()
+function parseProps() {
   if (area.value) {
     const { s, v } = hslToHsv(props.h, props.s, props.l)
     moveCursor({
       pageX: area.value.x + s * area.value.width,
       pageY: (area.value.y + area.value.height) - v * area.value.height
-    })
+    }, false)
   }
+}
+
+watch(() => [props.h, props.s, props.l], () => {
+  parseProps()
+})
+
+onMounted(() => {
+  updateArea()
+  parseProps()
 })
 </script>
 
@@ -85,7 +85,7 @@ onMounted(() => {
   <div 
     ref="areaDom"
     class="clr-pckr-area"
-    @click="moveCursor($event, true)"
+    @click="moveCursor($event)"
     @pointerdown="startDragging"
   >
     <div
@@ -97,7 +97,7 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .clr-pckr-area {
-  width: 100%;
+  border-radius: 8px;
   aspect-ratio: 3/2;
   background-image:
     linear-gradient(rgba(0,0,0,0),#000),
@@ -107,7 +107,7 @@ onMounted(() => {
 
   .clr-pckr-area-cursor {
     position: absolute;
-    background-color: v-bind(currentColor);
+    background-color: v-bind(thumbColor);
     border-radius: 999px;
     width: 20px;
     height: 20px;

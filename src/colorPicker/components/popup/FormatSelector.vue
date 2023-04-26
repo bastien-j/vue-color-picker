@@ -1,20 +1,23 @@
 <script setup lang="ts">
+import type { ColorFormat } from '@/colorPicker/types';
+
 const props = defineProps<{
-  modelValue: string
+  format: ColorFormat
 }>()
 defineEmits<{
-  (e: 'update:model-value', value: typeof props.modelValue): void
+  (e: 'update', value: typeof props.format): void
 }>()
 </script>
 
 <template>
   <select
     class="clr-pckr-frmt-slct"
-    :value="modelValue"
-    @change="$emit('update:model-value', ($event.target as HTMLSelectElement).value)"
+    :value="format"
+    @change="$emit('update', ($event.target as HTMLSelectElement).value)"
   >
     <option value="hsl">HSL</option>
     <option value="rgb">RGB</option>
+    <option value="hex">HEX</option>
   </select>
 </template>
 

@@ -9,6 +9,7 @@ const props = withDefaults(defineProps<{
   max?: number
   step?: number
   label?: string
+  hideHeader?: boolean
 }>(), {
   min: 0,
   max: 100,
@@ -47,7 +48,7 @@ watch(() => props.modelValue, () => {
 
 <template>
   <div class="clr-pckr-sldr">
-    <div class="clr-pckr-sldr-hdr">
+    <div v-if="!hideHeader" class="clr-pckr-sldr-hdr">
       <span>{{ label ?? 'Value' }}</span>
       <input type="text" :maxlength="max.toString().length" v-model="inputValue" @change="inputHandler" />
     </div>
