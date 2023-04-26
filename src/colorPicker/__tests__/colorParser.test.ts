@@ -40,3 +40,6 @@ test('guess invalid hex', () => {
 test('rgb to hsl', () => {
   expect(rgbToHsl(95, 127, 191)).toStrictEqual({ h: 220, s: 0.43, l: 0.56 })
 })
+test('rgb to hsl bis', () => {
+  expect(rgbToHsl(247, 202, 214)).toStrictEqual({ h: 344, s: 0.74, l: 0.88 })
+})

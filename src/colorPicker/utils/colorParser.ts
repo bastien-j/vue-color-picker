@@ -141,32 +141,33 @@ export function hslToRgb(h: number, s: number, l: number): RGB {
   }
 }
 
-export function rgbToHsl(r: number, g: number, b: number): HSL {
+// Thanks ChatGPT :)
+export function rgbToHsl(r: number, g: number, b: number) {
   r /= 255
   g /= 255
   b /= 255
 
-  const v = Math.max(r, g, b)
-  const c = v - Math.min(r, g, b)
-  const l = v - c / 2
+  const cMax = Math.max(r, g, b)
+  const cMin = Math.min(r, g, b)
+  const delta = cMax - cMin
+  const l = (cMax + cMin) / 2
 
-  let h = 0
-  if (c !== 0) {
-    if (v === r) h = 60*(((g - b) / c) % 6)
-    else if (v === g) h = 60*(((b - r) / c) + 2)
-    else h = 60*(((r - g) / c) + 4)
-  }
+  if (delta === 0) return { h: 0, s: 0, l: l}
 
-  let s = 0
-  if (l !== 0 && l !== 1) {
-    s = (v - l) / Math.min(l, 1 - l)
-  }
+  const s = delta / (1 - Math.abs(2 * l - 1))
 
-  return {
-    h: Math.round(h),
-    s: parseFloat(s.toFixed(2)),
-    l: parseFloat(l.toFixed(2))
-  }
+  let h = cMax === r
+    ? ((g - b) / delta) % 6
+    : cMax === g
+      ? ((b - r) / delta) + 2
+      : cMax === b
+        ? ((r - g) / delta) + 4
+        : 0
+
+  h *= 60
+  if (h < 0) h += 360
+
+  return { h: Math.round(h), s: parseFloat(s.toFixed(2)), l: parseFloat(l.toFixed(2)) }
 }
 
 export function rgbToHex(r: number, g: number, b: number): string {
