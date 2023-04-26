@@ -2,7 +2,7 @@
 import { computed, ref, watch, type StyleValue } from 'vue';
 
 const props = withDefaults(defineProps<{
-  modelValue?: number
+  modelValue: number
   gradient?: string
   thumbColor?: string
   min?: number
@@ -16,7 +16,7 @@ const props = withDefaults(defineProps<{
   modelValue: 0
 })
 const emits = defineEmits<{
-  (e: 'update:model-value', value?: typeof props.modelValue): void
+  (e: 'update:model-value', value: typeof props.modelValue): void
 }>()
 
 const inputValue = ref(props.modelValue ?? 0)

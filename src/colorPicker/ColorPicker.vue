@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import PickerPopup from './components/PickerPopup.vue';
 import PopupLayout from './components/popup/PopupLayout.vue';
+import { onClickOutside } from '@vueuse/core'
 
 const props = defineProps<{
   modelValue?: string
@@ -9,11 +9,11 @@ const props = defineProps<{
 }>()
 const emits = defineEmits(['update:modelValue', 'update'])
 
-const popupRef = ref<InstanceType<typeof PickerPopup>>()
+const popupRef = ref()
 const currentColor = ref(props.modelValue ?? props.value ?? 'hsl(0, 0%, 0%)')
 
 function toggle() {
-  popupRef.value?.toggle()
+  popupRef.value.toggle()
 }
 
 function emitColor(color: string) {
@@ -21,17 +21,14 @@ function emitColor(color: string) {
   if (props.modelValue) emits('update:modelValue', color)
   else emits('update', color)
 }
+
+onClickOutside(popupRef, () => popupRef.value.close())
 </script>
 
 <template>
   <div class="clr-pckr">
     <button @click.prevent="toggle()"></button>
-    <PopupLayout />
-    <!-- <PickerPopup
-      ref="popupRef"
-      :color="currentColor"
-      @update="emitColor($event)"
-    /> -->
+    <PopupLayout ref="popupRef" :color="currentColor" @close="emitColor($event)" />
   </div>
 </template>
 

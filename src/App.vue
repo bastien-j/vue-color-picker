@@ -5,7 +5,7 @@ const HSL_COLOR = "hsl(113, 67%, 50%)"
 const RGB_COLOR = "rgb(62, 213, 42)"
 const HEX_COLOR = "#3ed52a"
 
-const myColor = ref(RGB_COLOR)
+const myColor = ref(HSL_COLOR)
 </script>
 
 <template>
