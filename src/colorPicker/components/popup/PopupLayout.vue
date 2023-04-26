@@ -18,7 +18,7 @@ const emits = defineEmits<{
   (e: 'open'): void
 }>()
 
-const show = ref(true)
+const show = ref(false)
 const copySuccess = ref(false)
 const currentColor = ref(props.color)
 const format = ref<ColorFormat>('hsl')
