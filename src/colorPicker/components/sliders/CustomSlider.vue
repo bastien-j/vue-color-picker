@@ -114,7 +114,7 @@ watch(() => props.modelValue, () => {
       border: var(--thmb-brd-sz) solid white;
       cursor: pointer;
       box-shadow:
-        0 0 1px hsl(0, 0%, 0%),
+        0 0 2px hsl(0, 0%, 0%),
         inset 0 0 1px hsl(0, 0%, 40%);
     }
   }
